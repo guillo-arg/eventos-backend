@@ -6,5 +6,7 @@ namespace eventos_backend.Services.Interfaces
     {
         Task<ServiceResponse<string>> Register(RegisterDTO registerDto);
         Task<ServiceResponse<string>> Login(LoginDTO loginDto);
+        Task<ServiceResponse<string>> CreateRole(RoleDTO roleDTO);
+        Task<ServiceResponse<string>> AssignRole(AssignRoleDTO assignRoleDTO);
     }
 }

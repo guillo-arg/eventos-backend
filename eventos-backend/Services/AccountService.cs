@@ -113,5 +113,52 @@ namespace eventos_backend.Services
 
             return response;
         }
+
+        public async Task<ServiceResponse<string>> CreateRole(RoleDTO roleDTO)
+        {
+            ServiceResponse<string> serviceResponse = new ServiceResponse<string>();
+            try
+            {
+
+                if (await _roleManager.RoleExistsAsync(roleDTO.Name))
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Data = $"El rol con el nombre: {roleDTO.Name} ya existe";
+                    return serviceResponse;
+                }
+
+                Role role = new Role()
+                {
+                    Name = roleDTO.Name,
+                    Id = Guid.NewGuid().ToString()
+                };
+
+                IdentityResult identityResult = await _roleManager.CreateAsync(role);
+                if (identityResult.Succeeded)
+                {
+                    serviceResponse.Success = true;
+                    serviceResponse.Data = $"Se creó el rol {roleDTO.Name}";
+                    return serviceResponse;
+                }
+                else
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Data = $"No se pudo crear el rol: ${roleDTO.Name}";
+                    return serviceResponse;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Data = "No se pudo crear el rol: ${roleDTO.Name}";
+                return serviceResponse;
+            }
+        }
+
+        public async Task<ServiceResponse<string>> AssignRole(AssignRoleDTO assignRoleDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

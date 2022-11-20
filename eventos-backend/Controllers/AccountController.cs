@@ -2,12 +2,14 @@
 using eventos_backend.Models;
 using eventos_backend.Services;
 using eventos_backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eventos_backend.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AccountController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -57,6 +59,50 @@ namespace eventos_backend.Controllers
             }
 
             ServiceResponse<string> serviceResponse = await _accountService.Login(loginDto);
+
+            if (serviceResponse.Success)
+            {
+                return Ok(serviceResponse.Data);
+            }
+            else
+            {
+                return BadRequest(serviceResponse.Data);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("Role")]
+        public async Task<IActionResult> CreateRole([FromBody] RoleDTO roleDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ServiceResponse<string> serviceResponse = await _accountService.CreateRole(roleDTO);
+
+            if (serviceResponse.Success)
+            {
+                return Ok(serviceResponse.Data);
+            }
+            else
+            {
+                return BadRequest(serviceResponse.Data);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("AssignRole")]
+        public async Task<IActionResult> AssignRole([FromBody]AssignRoleDTO assignRoleDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ServiceResponse<string> serviceResponse = await _accountService.AssignRole(assignRoleDTO);
 
             if (serviceResponse.Success)
             {
