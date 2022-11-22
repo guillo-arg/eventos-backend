@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using eventos_backend.Exceptions;
 
 namespace eventos_backend.Services
 {
@@ -25,24 +26,17 @@ namespace eventos_backend.Services
             _configuration = configuration;
         }
 
-        public async Task<ServiceResponse<string>> Login(LoginDTO loginDto)
+        public async Task<string> Login(LoginDTO loginDto)
         {
-            ServiceResponse<string> response = new ServiceResponse<string>();
 
             if (_userManager.Users.All(x => x.UserName != loginDto.Username))
             {
-                response.Success = false;
-                response.Data = "No se encontró el usuario";
-
-                return response;
+                throw new AppException(new List<string>() { "No se encontró el usuario" }, 400);
             }
 
             if (_userManager.Users.Any(x => x.UserName.ToUpper() == loginDto.Username.ToUpper() && !x.Enabled))
             {
-                response.Success = false;
-                response.Data = "Usuario inactivo";
-
-                return response;
+                throw new AppException(new List<string>() { "Usuario inactivo" }, 400);
             }
 
 
@@ -54,17 +48,11 @@ namespace eventos_backend.Services
                 //generar token
                 string token = GenerateJSONWebToken(user);
 
-                response.Success = true;
-                response.Data = token;
-
-                return response;
+                return token;
             }
             else
             {
-                response.Success = false;
-                response.Data = "Credenciales incorrectas";
-
-                return response;
+                throw new AppException(new List<string>() { "Credenciales incorrectas" }, 400);                
             }
 
         }
@@ -88,9 +76,9 @@ namespace eventos_backend.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<ServiceResponse<string>> Register(RegisterDTO registerDto)
+        public async Task<string> Register(RegisterDTO registerDto)
         {
-            ServiceResponse<string> response = new ServiceResponse<string>();
+            
             User user = new User()
             {
                 UserName = registerDto.Username,
@@ -101,30 +89,24 @@ namespace eventos_backend.Services
             IdentityResult registerResult = _userManager.CreateAsync(user, registerDto.Password).Result;
 
             if (registerResult.Succeeded)
-            {
-                response.Success = true;
-                response.Data = "Se registró correctamente el usuario";
+            {                
+                return "Se registró correctamente el usuario";
             }
             else
             {
-                response.Success = false;
-                response.Data = "No se pudo registrar el usuario";
+                List<string> errors = registerResult.Errors.Select(x => x.Description).ToList();
+                throw new AppException(errors, 400);                
             }
-
-            return response;
         }
 
-        public async Task<ServiceResponse<string>> CreateRole(RoleDTO roleDTO)
-        {
-            ServiceResponse<string> serviceResponse = new ServiceResponse<string>();
+        public async Task<string> CreateRole(RoleDTO roleDTO)
+        {            
             try
             {
 
                 if (await _roleManager.RoleExistsAsync(roleDTO.Name))
                 {
-                    serviceResponse.Success = false;
-                    serviceResponse.Data = $"El rol con el nombre: {roleDTO.Name} ya existe";
-                    return serviceResponse;
+                    throw new AppException(new List<string>() { $"El rol con el nombre: {roleDTO.Name} ya existe" }, 400);
                 }
 
                 Role role = new Role()
@@ -136,27 +118,21 @@ namespace eventos_backend.Services
                 IdentityResult identityResult = await _roleManager.CreateAsync(role);
                 if (identityResult.Succeeded)
                 {
-                    serviceResponse.Success = true;
-                    serviceResponse.Data = $"Se creó el rol {roleDTO.Name}";
-                    return serviceResponse;
+                    return $"Se creó el rol {roleDTO.Name}";
                 }
                 else
                 {
-                    serviceResponse.Success = false;
-                    serviceResponse.Data = $"No se pudo crear el rol: ${roleDTO.Name}";
-                    return serviceResponse;
+                    throw new AppException(new List<string>() { $"No se pudo crear el rol: ${roleDTO.Name}" }, 400);;
                 }
 
             }
             catch (Exception ex)
             {
-                serviceResponse.Success = false;
-                serviceResponse.Data = "No se pudo crear el rol: ${roleDTO.Name}";
-                return serviceResponse;
+                throw new AppException(new List<string>() {$"No se pudo crear el rol: {roleDTO.Name}" }, 400); ;
             }
         }
 
-        public async Task<ServiceResponse<string>> AssignRole(AssignRoleDTO assignRoleDTO)
+        public async Task<string> AssignRole(AssignRoleDTO assignRoleDTO)
         {
             throw new NotImplementedException();
         }

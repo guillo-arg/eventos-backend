@@ -1,3 +1,4 @@
+using eventos_backend.Middlewares;
 using eventos_backend.Models;
 using eventos_backend.Services;
 using eventos_backend.Services.Interfaces;
@@ -83,6 +84,7 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+app.UseFormatResponse();
 
 app.UseAuthentication();
 app.UseAuthorization();

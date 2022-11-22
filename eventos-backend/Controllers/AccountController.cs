@@ -1,4 +1,5 @@
 ﻿using eventos_backend.DTOs.Account;
+using eventos_backend.Exceptions;
 using eventos_backend.Models;
 using eventos_backend.Services;
 using eventos_backend.Services.Interfaces;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace eventos_backend.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("[Controller]")]
     public class AccountController : Controller
     {
         private readonly SignInManager<User> _signInManager;
@@ -33,41 +35,27 @@ namespace eventos_backend.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
+                throw new AppException(errors, 400);
             }
 
-            ServiceResponse<string> serviceResponse = await _accountService.Register(registerDto);
-
-            if (serviceResponse.Success)
-            {
-                return Ok(serviceResponse.Data);
-            }
-            else
-            {
-                return BadRequest(serviceResponse.Data);
-            }
+            string response = await _accountService.Register(registerDto);
+            return Ok(response);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
-        {
+        {           
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
+                throw new AppException(errors, 400);
             }
 
-            ServiceResponse<string> serviceResponse = await _accountService.Login(loginDto);
-
-            if (serviceResponse.Success)
-            {
-                return Ok(serviceResponse.Data);
-            }
-            else
-            {
-                return BadRequest(serviceResponse.Data);
-            }
+            string response = await _accountService.Login(loginDto);
+            return Ok(response);
         }
 
         [Authorize]
@@ -77,19 +65,13 @@ namespace eventos_backend.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
+                throw new AppException(errors, 400);
             }
 
-            ServiceResponse<string> serviceResponse = await _accountService.CreateRole(roleDTO);
+            string response = await _accountService.CreateRole(roleDTO);
+            return Ok(response);
 
-            if (serviceResponse.Success)
-            {
-                return Ok(serviceResponse.Data);
-            }
-            else
-            {
-                return BadRequest(serviceResponse.Data);
-            }
         }
 
         [Authorize]
@@ -99,19 +81,21 @@ namespace eventos_backend.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
+                throw new AppException(errors, 400);
             }
 
-            ServiceResponse<string> serviceResponse = await _accountService.AssignRole(assignRoleDTO);
+            string response = await _accountService.AssignRole(assignRoleDTO);
 
-            if (serviceResponse.Success)
-            {
-                return Ok(serviceResponse.Data);
-            }
-            else
-            {
-                return BadRequest(serviceResponse.Data);
-            }
+            return Ok(response);
         }
+
+        //[Authorize]
+        //[HttpGet]
+        //[Route("User")]
+        //public async Task<IActionResult> GetUsers()
+        //{
+        //    ServiceResponse<UserDTO> serviceResponse = _
+        //}
     }
 }
