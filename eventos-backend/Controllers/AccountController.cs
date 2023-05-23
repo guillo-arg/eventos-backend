@@ -90,12 +90,39 @@ namespace eventos_backend.Controllers
             return Ok(response);
         }
 
-        //[Authorize]
-        //[HttpGet]
-        //[Route("User")]
-        //public async Task<IActionResult> GetUsers()
-        //{
-        //    ServiceResponse<UserDTO> serviceResponse = _
-        //}
+        [Authorize]
+        [HttpGet]
+        [Route("Users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            List<UserDTO> userDTOs = await _accountService.GetAllUsers();
+
+            return Ok(userDTOs);
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("Users/{id}")]
+        public async Task<IActionResult> GetUser(string id)
+        {
+            UserDTO userDTO = await _accountService.GetUserById(id);
+
+            return Ok(userDTO);
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("Roles")]
+        public async Task<IActionResult> GetRoles()
+        {
+            List<RoleDTO> roleDTOs = await _accountService.GetAllRoles();
+
+            return Ok(roleDTOs);
+        }
+
+
+
+
     }
 }

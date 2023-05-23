@@ -8,5 +8,8 @@ namespace eventos_backend.Services.Interfaces
         Task<string> Login(LoginDTO loginDto);
         Task<string> CreateRole(RoleDTO roleDTO);
         Task<string> AssignRole(AssignRoleDTO assignRoleDTO);
+        Task<List<UserDTO>> GetAllUsers();
+        Task<UserDTO> GetUserById(string id);
+        Task<List<RoleDTO>> GetAllRoles();
     }
 }

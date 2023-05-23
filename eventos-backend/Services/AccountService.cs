@@ -6,8 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using eventos_backend.Exceptions;
+using AutoMapper;
+using eventos_backend.Helpers;
 
 namespace eventos_backend.Services
 {
@@ -17,6 +18,7 @@ namespace eventos_backend.Services
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _autoMapper; 
 
         public AccountService(AppDataContext appDataContext, UserManager<User> userManager, RoleManager<Role> roleManager, IConfiguration configuration)
         {
@@ -24,6 +26,8 @@ namespace eventos_backend.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _autoMapper = AutomapperConfiguration.Instance().CreateMapper();
+
         }
 
         public async Task<string> Login(LoginDTO loginDto)
@@ -78,7 +82,7 @@ namespace eventos_backend.Services
 
         public async Task<string> Register(RegisterDTO registerDto)
         {
-            
+
             User user = new User()
             {
                 UserName = registerDto.Username,
@@ -135,6 +139,38 @@ namespace eventos_backend.Services
         public async Task<string> AssignRole(AssignRoleDTO assignRoleDTO)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<UserDTO>> GetAllUsers()
+        {
+            var users = _appDataContext.Users.ToList();
+
+            List<UserDTO> userDtos = _autoMapper.Map<List<UserDTO>>(users);
+
+            return userDtos;
+        }
+
+        public async Task<UserDTO> GetUserById(string id)
+        {
+            var user = _appDataContext.Users.Where(x => x.Id == id).FirstOrDefault();
+            if (user == null)
+            {
+                throw new AppException(new List<string>() { $"No se pudo encontrar el usuario con id: {id}" }, 404); ;
+            }
+
+            UserDTO userDTO = _autoMapper.Map<UserDTO>(user);
+
+            return userDTO;
+                    
+        }
+
+        public async Task<List<RoleDTO>> GetAllRoles()
+        {
+            var roles = _appDataContext.Roles.ToList(); 
+
+            List<RoleDTO> roleDTOs = _autoMapper.Map<List<RoleDTO>>(roles);
+
+            return roleDTOs;
         }
     }
 }

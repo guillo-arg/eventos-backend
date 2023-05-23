@@ -35,7 +35,7 @@ namespace eventos_backend.Middlewares
                         updatedBody.Seek(0, SeekOrigin.Begin);
                         var newContent = new StreamReader(updatedBody).ReadToEnd();
                         responseDTO.Result = true;
-                        if (httpContext.Response.ContentType == "application/json")
+                        if (httpContext.Response.ContentType!= null && httpContext.Response.ContentType.Contains("application/json"))
                         {
                             responseDTO.Data = JsonConvert.DeserializeObject(newContent);
                         }
