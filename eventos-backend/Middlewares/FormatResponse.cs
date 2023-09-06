@@ -11,16 +11,19 @@ namespace eventos_backend.Middlewares
     public class FormatResponse
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<FormatResponse> _logger;  
 
-        public FormatResponse(RequestDelegate next)
+        public FormatResponse(RequestDelegate next, ILogger<FormatResponse> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
 
             ResponseDTO responseDTO = new ResponseDTO();
+            responseDTO.Errors = new List<string>();
 
             using (var responseBody = new MemoryStream())
             {
@@ -63,6 +66,7 @@ namespace eventos_backend.Middlewares
                             default:
                                 responseDTO.Errors.Add("Error General");
                                 response.StatusCode = 500;
+                                _logger.LogError(ex.ToString());    
                                 break;
                         }
 

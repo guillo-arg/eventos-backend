@@ -90,6 +90,9 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 }));
 
 builder.Services.AddTransient<IAccountService, AccountService>();
+builder.Services.AddTransient<IPersonaService, PersonaService>();
+builder.Services.AddTransient<IProvinciaService, ProvinciaService>();   
+builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 
 
 

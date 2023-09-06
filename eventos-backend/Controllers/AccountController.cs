@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace eventos_backend.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("[Controller]")]
-    public class AccountController : Controller
+    [Route("api/[controller]")]
+    public class AccountController : ControllerBase
     {
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
@@ -33,27 +33,20 @@ namespace eventos_backend.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
-                throw new AppException(errors, 400);
-            }
+            ValidateModel();
 
             string response = await _accountService.Register(registerDto);
             return Ok(response);
         }
 
+
+
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
-        {           
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
-                throw new AppException(errors, 400);
-            }
-
+        {
+            ValidateModel();
             string response = await _accountService.Login(loginDto);
             return Ok(response);
         }
@@ -63,11 +56,7 @@ namespace eventos_backend.Controllers
         [Route("Role")]
         public async Task<IActionResult> CreateRole([FromBody] RoleDTO roleDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
-                throw new AppException(errors, 400);
-            }
+            ValidateModel();
 
             string response = await _accountService.CreateRole(roleDTO);
             return Ok(response);
@@ -79,11 +68,7 @@ namespace eventos_backend.Controllers
         [Route("AssignRole")]
         public async Task<IActionResult> AssignRole([FromBody]AssignRoleDTO assignRoleDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
-                throw new AppException(errors, 400);
-            }
+            ValidateModel();
 
             string response = await _accountService.AssignRole(assignRoleDTO);
 
@@ -122,7 +107,14 @@ namespace eventos_backend.Controllers
         }
 
 
-
+        private void ValidateModel()
+        {
+            if (!ModelState.IsValid)
+            {
+                List<string> errors = ModelState.Select(x => x.Value.Errors.FirstOrDefault().ErrorMessage).ToList();
+                throw new AppException(errors, 400);
+            }
+        }
 
     }
 }
