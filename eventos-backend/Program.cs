@@ -93,6 +93,7 @@ builder.Services.AddTransient<IAccountService, AccountService>();
 builder.Services.AddTransient<IPersonaService, PersonaService>();
 builder.Services.AddTransient<IProvinciaService, ProvinciaService>();   
 builder.Services.AddTransient<ICategoriaService, CategoriaService>();
+builder.Services.AddTransient<IEventoService, EventoService>();
 
 
 

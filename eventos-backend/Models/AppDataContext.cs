@@ -12,5 +12,6 @@ namespace eventos_backend.Models
         public DbSet<Persona> Personas { get; set; }
         public DbSet<Provincia> Provincias { get; set; }    
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Evento> Eventos { get; set; }
     }
 }
