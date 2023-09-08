@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eventos_backend.DTOs.Account;
+using eventos_backend.DTOs.Comedor;
 using eventos_backend.DTOs.Hospedaje;
 using eventos_backend.DTOs.Persona;
 using eventos_backend.Models;
@@ -26,7 +27,7 @@ namespace eventos_backend.Helpers
                     conf.CreateMap<Role, RoleDTO>().ReverseMap();
                     conf.CreateMap<Persona, PostPersonaDTO>().ReverseMap();
                     conf.CreateMap<Hospedaje, PostHospedajeDTO>().ReverseMap();
-
+                    conf.CreateMap<Comedor, PostComedorDto>().ReverseMap();
 
                 });
             }

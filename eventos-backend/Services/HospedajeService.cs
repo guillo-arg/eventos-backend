@@ -12,16 +12,18 @@ namespace eventos_backend.Services
         private readonly ILogger<HospedajeService> _logger;
         private readonly AppDataContext _appDataContext;
         private readonly IMapper _autoMapper;
-        public HospedajeService(ILogger<HospedajeService> logger, AppDataContext appDataContext)
+        private readonly IEventoService _eventoService;
+        public HospedajeService(ILogger<HospedajeService> logger, AppDataContext appDataContext, IEventoService eventoService)
         {
             _appDataContext = appDataContext;
             _logger = logger;
             _autoMapper = AutomapperConfiguration.Instance().CreateMapper();
+            _eventoService = eventoService;
 
         }
         public async Task<PostHospedajeDTO> CreateHospedaje(int eventoId, PostHospedajeDTO postHospedajeDto)
         {
-            Evento evento = ValidateExistsEvento(eventoId);
+            Evento evento = await _eventoService.GetById(eventoId);
             Hospedaje hospedaje = _autoMapper.Map<Hospedaje>(postHospedajeDto);
             hospedaje.Id = 0;
             hospedaje.EventoId = eventoId;
@@ -44,7 +46,7 @@ namespace eventos_backend.Services
 
         public async Task<string> DeleteHospedaje(int eventoId, int id)
         {
-            Evento evento = ValidateExistsEvento(eventoId);
+            Evento evento = await _eventoService.GetById(eventoId);
             Hospedaje hospedaje = ValidateExists(eventoId,id);
 
             try
@@ -65,7 +67,7 @@ namespace eventos_backend.Services
 
         public async Task<List<Hospedaje>> GetAllByEvento(int eventoId)
         {
-            Evento evento = ValidateExistsEvento(eventoId);
+            Evento evento = await _eventoService.GetById(eventoId);
             List<Hospedaje> hospedajes = _appDataContext.Hospedajes.Where(x => x.EventoId == eventoId).ToList();
 
             return hospedajes;
@@ -73,7 +75,7 @@ namespace eventos_backend.Services
 
         public async Task<Hospedaje> GetById(int eventoId, int id)
         {
-            Evento evento = ValidateExistsEvento(eventoId);
+            Evento evento = await _eventoService.GetById(eventoId);
             Hospedaje hospedaje = ValidateExists(eventoId, id);
 
             return hospedaje;
@@ -82,7 +84,7 @@ namespace eventos_backend.Services
 
         public async Task<PostHospedajeDTO> UpdateHospedaje(int eventoId, PostHospedajeDTO postHospedajeDto)
         {
-            Evento evento = ValidateExistsEvento(eventoId);
+            Evento evento = await _eventoService.GetById(eventoId);
             Hospedaje hospedajeDb = ValidateExists(eventoId, postHospedajeDto.Id);
             MapUpdate(hospedajeDb, postHospedajeDto);
 
@@ -105,17 +107,6 @@ namespace eventos_backend.Services
             hospedajeDb.Precio = postHospedajeDto.Precio;
             hospedajeDb.Tipo = postHospedajeDto.Tipo;
             
-        }
-
-        private Evento ValidateExistsEvento(int eventoId)
-        {
-            Evento evento = _appDataContext.Eventos.FirstOrDefault(x => x.Id == eventoId);
-            if (evento == null)
-            {
-                throw new AppException(new List<string>() { $"No se pudo encontrar el evento con ID: {eventoId}" }, 404);
-            }
-
-            return evento;
         }
 
         private Hospedaje ValidateExists(int eventoId, int id)

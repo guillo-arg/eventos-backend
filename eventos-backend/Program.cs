@@ -95,6 +95,7 @@ builder.Services.AddTransient<IProvinciaService, ProvinciaService>();
 builder.Services.AddTransient<ICategoriaService, CategoriaService>();
 builder.Services.AddTransient<IEventoService, EventoService>();
 builder.Services.AddTransient<IHospedajeService,  HospedajeService>();
+builder.Services.AddTransient<IComedorService, ComedorService>();
 
 var app = builder.Build();
 
