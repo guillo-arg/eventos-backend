@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eventos_backend.DTOs.Account;
+using eventos_backend.DTOs.Hospedaje;
 using eventos_backend.DTOs.Persona;
 using eventos_backend.Models;
 using System.Reflection;
@@ -23,8 +24,8 @@ namespace eventos_backend.Helpers
                 instance = new MapperConfiguration(conf => {
                     conf.CreateMap<User, UserDTO>().ReverseMap();
                     conf.CreateMap<Role, RoleDTO>().ReverseMap();
-                    conf.CreateMap<Persona, PostPersonaDTO>()
-                    .ReverseMap();
+                    conf.CreateMap<Persona, PostPersonaDTO>().ReverseMap();
+                    conf.CreateMap<Hospedaje, PostHospedajeDTO>().ReverseMap();
 
 
                 });

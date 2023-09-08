@@ -17,6 +17,7 @@ namespace eventos_backend.Services
         }
         public async Task<Evento> CreateEvento(Evento evento)
         {
+            evento.Id = 0;
 
             try
             {
